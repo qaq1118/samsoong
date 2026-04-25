@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';   // 👈 이 줄이 없으면 MainHomeScreen을 못 찾아요!
-import 'signup_screen.dart'; // 👈 회원가입 화면도 연결되어 있어야 합니다.
+import 'main_frame.dart';
+import 'common.dart';
+
 class MainHomeScreen extends StatelessWidget {
   const MainHomeScreen({super.key});
 
@@ -23,6 +24,30 @@ class MainHomeScreen extends StatelessWidget {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
             ),
             const SizedBox(height: 40),
+            ElevatedButton.icon(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => Scaffold(
+                  body: ListView(children: [SettingsLightScreen()]),
+                )),
+              ),
+              icon: const Icon(Icons.settings),
+              label: const Text('설정 (라이트)'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => Scaffold(
+                  backgroundColor: const Color.fromARGB(255, 18, 32, 47),
+                  body: ListView(children: [SettingsDarkScreen()]),
+                )),
+              ),
+              icon: const Icon(Icons.settings),
+              label: const Text('설정 (다크)'),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[800]),
+            ),
+            const SizedBox(height: 12),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
               child: const Text('로그아웃'),

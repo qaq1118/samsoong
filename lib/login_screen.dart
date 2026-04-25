@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'signup_screen.dart'; // 👈 파일이 생성되어 있어야 에러가 안 납니다!
-import 'home_screen.dart';
+import 'signup_screen.dart';
+import 'contact_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   runApp(const FigmaToCodeApp());
@@ -167,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     if (mounted) {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => const MainHomeScreen()),
+                                        MaterialPageRoute(builder: (context) => const ContactScreen()),
                                       );
                                     }
                                   } else {
