@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'login_screen.dart';
+import 'profile.dart';
 
 class SettingScreen extends StatelessWidget {
   const SettingScreen({super.key});
@@ -22,6 +24,24 @@ class SettingContent extends StatefulWidget {
 
 class _SettingContentState extends State<SettingContent> {
   File? _profileImage;
+  String _name = '최지우';
+  String _username = '@okong';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _name = prefs.getString('profile_name') ?? '최지우';
+      _username = prefs.getString('profile_username') ?? '@okong';
+      final imagePath = prefs.getString('profile_image');
+      if (imagePath != null) _profileImage = File(imagePath);
+    });
+  }
 
   Future<void> _pickImage() async {
     showModalBottomSheet(
@@ -137,7 +157,13 @@ class _SettingContentState extends State<SettingContent> {
                         right: 0,
                         bottom: 0,
                         child: GestureDetector(
-                          onTap: _pickImage,
+                          onTap: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => Frame()),
+                            );
+                            _loadProfile();
+                          },
                           child: Container(
                             width: 32,
                             height: 32,
@@ -148,9 +174,9 @@ class _SettingContentState extends State<SettingContent> {
                               ),
                             ),
                             child: const Icon(
-                              Icons.add,
+                              Icons.edit,
                               color: Colors.white,
-                              size: 18,
+                              size: 16,
                             ),
                           ),
                         ),
@@ -159,9 +185,9 @@ class _SettingContentState extends State<SettingContent> {
                   ),
                 ),
                 const SizedBox(height: 14),
-                const Text(
-                  '최지우',
-                  style: TextStyle(
+                Text(
+                  _name,
+                  style: const TextStyle(
                     color: Color(0xFF1F2024),
                     fontSize: 20,
                     fontFamily: 'Inter',
@@ -169,9 +195,9 @@ class _SettingContentState extends State<SettingContent> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  '@okong',
-                  style: TextStyle(
+                Text(
+                  _username,
+                  style: const TextStyle(
                     color: Color(0xFF71727A),
                     fontSize: 15,
                     fontFamily: 'Inter',

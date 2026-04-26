@@ -18,6 +18,7 @@ class _ContactScreenState extends State<ContactScreen>
   int _selectedNavIndex = 0;
   bool _isSearching = false;
   bool _isChatSearching = false;
+  bool _isChatEditMode = false;
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _chatSearchController = TextEditingController();
   String _chatSearchQuery = '';
@@ -87,7 +88,9 @@ class _ContactScreenState extends State<ContactScreen>
           // 1: Q&A
           QuestionContent(),
           // 2: 문자
-          ChatContent(searchQuery: _chatSearchQuery),
+          _isChatSearching
+              ? ChatContent(searchQuery: _chatSearchQuery, isEditMode: false, showSearchBar: false)
+              : ChatContent(searchQuery: _chatSearchQuery, isEditMode: _isChatEditMode, onEditModeChanged: (v) => setState(() => _isChatEditMode = v), onSearchTap: () => setState(() => _isChatSearching = true)),
           // 3: 설정
           SettingContent(),
         ],
@@ -147,12 +150,21 @@ class _ContactScreenState extends State<ContactScreen>
       backgroundColor: Colors.white,
       elevation: 0,
       automaticallyImplyLeading: false,
+      title: const Text(
+        '문자',
+        style: TextStyle(
+          color: Color(0xFF1F2024),
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+      centerTitle: true,
       actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 8),
-          child: IconButton(
-            icon: const Icon(Icons.search, color: Color(0xFF006FFD)),
-            onPressed: () => setState(() => _isChatSearching = true),
+        TextButton(
+          onPressed: () => setState(() => _isChatEditMode = !_isChatEditMode),
+          child: Text(
+            _isChatEditMode ? '완료' : '편집',
+            style: const TextStyle(color: Color(0xFF006FFD), fontSize: 16),
           ),
         ),
       ],

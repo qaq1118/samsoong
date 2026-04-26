@@ -13,6 +13,38 @@ class QuestionScreen extends StatelessWidget {
 }
 
 class QuestionContent extends StatelessWidget {
+  void _onPersonTap(BuildContext context, String name) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(name),
+        content: Text('$name 와의 질문과 답변 화면입니다.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('닫기'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _onQuestionTap(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('오늘의 질문'),
+        content: const Text('상대방이 가장 좋아하는 음식은?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('닫기'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -23,23 +55,25 @@ class QuestionContent extends StatelessWidget {
             // 1행: James / Bob 카드
             Row(
               children: [
-                Expanded(child: _buildPhotoCard('James')),
+                Expanded(child: GestureDetector(onTap: () => _onPersonTap(context, 'James'), child: _buildPhotoCard('James'))),
                 const SizedBox(width: 10),
-                Expanded(child: _buildPhotoCard('Bob')),
+                Expanded(child: GestureDetector(onTap: () => _onPersonTap(context, 'Bob'), child: _buildPhotoCard('Bob'))),
               ],
             ),
             const SizedBox(height: 10),
             // 2행: Lee / Kim 카드
             Row(
               children: [
-                Expanded(child: _buildPhotoCard('Lee')),
+                Expanded(child: GestureDetector(onTap: () => _onPersonTap(context, 'Lee'), child: _buildPhotoCard('Lee'))),
                 const SizedBox(width: 10),
-                Expanded(child: _buildPhotoCard('Kim')),
+                Expanded(child: GestureDetector(onTap: () => _onPersonTap(context, 'Kim'), child: _buildPhotoCard('Kim'))),
               ],
             ),
             const SizedBox(height: 20),
             // 질문 카드
-            Container(
+            GestureDetector(
+              onTap: () => _onQuestionTap(context),
+              child: Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: ShapeDecoration(
@@ -90,6 +124,7 @@ class QuestionContent extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
             ),
           ],
         ),
