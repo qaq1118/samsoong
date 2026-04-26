@@ -17,25 +17,28 @@ class QuestionContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 8),
-            // 통계 카드 2개
+            // 1행: James / Bob 카드
             Row(
               children: [
-                Expanded(
-                  child: _buildStatCard('작성한 질문', '5개'),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildStatCard('저장된 답변', '5개'),
-                ),
+                Expanded(child: _buildPhotoCard('James')),
+                const SizedBox(width: 10),
+                Expanded(child: _buildPhotoCard('Bob')),
               ],
             ),
-            const SizedBox(height: 16),
-            // Q&A 카드
+            const SizedBox(height: 10),
+            // 2행: Lee / Kim 카드
+            Row(
+              children: [
+                Expanded(child: _buildPhotoCard('Lee')),
+                const SizedBox(width: 10),
+                Expanded(child: _buildPhotoCard('Kim')),
+              ],
+            ),
+            const SizedBox(height: 20),
+            // 질문 카드
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
@@ -57,18 +60,20 @@ class QuestionContent extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: const Icon(
-                      Icons.help_outline,
-                      color: Color(0xFF006FFD),
-                      size: 20,
+                    child: const Center(
+                      child: Icon(
+                        Icons.help_outline,
+                        color: Color(0xFF006FFD),
+                        size: 20,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   const Text(
-                    '1번째 질문',
+                    '오늘의 질문',
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: 14,
+                      fontSize: 12,
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w400,
                     ),
@@ -92,35 +97,51 @@ class QuestionContent extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(String label, String value) {
+  Widget _buildPhotoCard(String name) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      height: 220,
       decoration: ShapeDecoration(
-        color: const Color(0xFFF7F8FD),
+        color: Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(width: 1, color: Color(0xFF006FFD)),
+          borderRadius: BorderRadius.circular(24),
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 12,
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w400,
+          // 하단 그라디언트
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 80,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0x00006FFD), Color(0xFF006FFD)],
+                ),
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(24),
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 22,
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w700,
+          // 이름
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 12,
+            child: Text(
+              name,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ],

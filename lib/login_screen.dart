@@ -45,35 +45,29 @@ class _LoginScreenState extends State<LoginScreen> {
             child: ConstrainedBox(
               constraints: BoxConstraints(minHeight: constraints.maxHeight),
               child: IntrinsicHeight(
-                child: Stack(
+                child: Column(
                   children: [
                     // 1. 상단 로고 영역
-                    Padding(
-                      padding: const EdgeInsets.only(top: 100),
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: Column(
-                          children: [
-                            const Icon(Icons.bookmark_added_outlined, size: 120, color: Colors.grey),
-                            const Text(
-                              'RE:Born',
-                              style: TextStyle(
-                                color: Color(0xA0342F2F),
-                                fontSize: 45,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 70),
+                        child: Container(
+                          color: Colors.white,
+                          width: double.infinity,
+                          child: Image.asset(
+                            'assets/logo.png',
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                     ),
 
+                    const SizedBox(height: 30),
+
                     // 2. 하단 로그인 폼
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Container(
+                    Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 80),
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
                         decoration: const BoxDecoration(
                           color: Colors.black,
                           borderRadius: BorderRadius.only(
@@ -220,8 +214,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ],
                         ),
                       ),
-                    ),
-                  ],
+                    ],
                 ),
               ),
             ),

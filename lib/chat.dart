@@ -21,16 +21,7 @@ class ChatContent extends StatefulWidget {
 }
 
 class _ChatContentState extends State<ChatContent> {
-  static const _allChatItems = [
-    {'name': '인물1', 'message': '잘 지내?', 'badge': '9'},
-    {'name': '인물2', 'message': '잘 지내?'},
-    {'name': '인물3', 'message': '잘 지내?', 'badge': '2'},
-    {'name': '인물4', 'message': '잘 지내?'},
-    {'name': '인물5', 'message': '잘 지내?'},
-    {'name': '인물6', 'message': '잘 지내?'},
-    {'name': '인물7', 'message': '잘 지내?'},
-    {'name': 'Peyton Sawyer', 'message': '잘 지내?'},
-  ];
+  static const _allChatItems = <Map<String, String?>>[];
 
   List<Map<String, String?>> get _filteredItems {
     final query = widget.searchQuery.toLowerCase();

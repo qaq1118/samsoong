@@ -42,9 +42,9 @@ class _ContactScreenState extends State<ContactScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: _isSearching
+      appBar: _isSearching && _selectedNavIndex == 0
           ? _buildSearchAppBar()
-          : _isChatSearching
+          : _isChatSearching && _selectedNavIndex == 2
           ? _buildChatSearchAppBar()
           : _selectedNavIndex == 0
           ? _buildContactAppBar()
@@ -252,7 +252,7 @@ class _ContactScreenState extends State<ContactScreen>
             tabs: const [
               Tab(text: '연락처'),
               Tab(text: '통화기록'),
-              Tab(text: '+ 추억 불러오기'),
+              Tab(text: '추억 불러오기'),
             ],
           ),
         ),
@@ -383,7 +383,14 @@ class _ContactScreenState extends State<ContactScreen>
     final color = isActive ? const Color(0xFF006FFD) : const Color(0xFF71727A);
     return Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => _selectedNavIndex = index),
+        onTap: () => setState(() {
+          _selectedNavIndex = index;
+          _isSearching = false;
+          _searchController.clear();
+          _isChatSearching = false;
+          _chatSearchController.clear();
+          _chatSearchQuery = '';
+        }),
         behavior: HitTestBehavior.opaque,
         child: Container(
           height: 72,
