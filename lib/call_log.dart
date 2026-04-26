@@ -8,7 +8,7 @@ class CallLogScreen extends StatelessWidget {
     return const Scaffold(
       body: CallLogContent(),
     );
-  }ㄴ
+  }
 }
 
 class CallLogContent extends StatelessWidget {
@@ -21,7 +21,7 @@ class CallLogContent extends StatelessWidget {
         '통화 기록',
         style: TextStyle(
           color: Color(0xA01F2024),
-          fontSize: 18,
+          fontSize: 20,
           fontFamily: 'Inter',
           fontWeight: FontWeight.w800,
         ),

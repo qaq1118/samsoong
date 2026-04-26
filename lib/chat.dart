@@ -5,15 +5,23 @@ class ChatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Colors.white,
       body: ChatContent(),
     );
   }
 }
 
-class ChatContent extends StatelessWidget {
-  static const _chatItems = [
+class ChatContent extends StatefulWidget {
+  final String searchQuery;
+  const ChatContent({super.key, this.searchQuery = ''});
+
+  @override
+  State<ChatContent> createState() => _ChatContentState();
+}
+
+class _ChatContentState extends State<ChatContent> {
+  static const _allChatItems = [
     {'name': '인물1', 'message': '잘 지내?', 'badge': '9'},
     {'name': '인물2', 'message': '잘 지내?'},
     {'name': '인물3', 'message': '잘 지내?', 'badge': '2'},
@@ -24,53 +32,41 @@ class ChatContent extends StatelessWidget {
     {'name': 'Peyton Sawyer', 'message': '잘 지내?'},
   ];
 
+  List<Map<String, String?>> get _filteredItems {
+    final query = widget.searchQuery.toLowerCase();
+    if (query.isEmpty) return List.from(_allChatItems);
+    return _allChatItems
+        .where((item) =>
+            item['name']!.toLowerCase().contains(query) ||
+            item['message']!.toLowerCase().contains(query))
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // 검색바
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: ShapeDecoration(
-              color: const Color(0xFFF7F8FD),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
-              ),
-            ),
-            child: const Row(
-              children: [
-                Icon(Icons.search, color: Color(0xFF8F9098), size: 16),
-                SizedBox(width: 8),
-                Text(
-                  '검색',
-                  style: TextStyle(
-                    color: Color(0xFF8F9098),
-                    fontSize: 14,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ],
-            ),
+    final items = _filteredItems;
+    if (items.isEmpty) {
+      return const Center(
+        child: Text(
+          '검색 결과가 없습니다.',
+          style: TextStyle(
+            color: Color(0xFF8F9098),
+            fontSize: 16,
+            fontFamily: 'Inter',
           ),
         ),
-        // 채팅 목록
-        Expanded(
-          child: ListView.builder(
-            itemCount: _chatItems.length,
-            itemBuilder: (context, index) {
-              final item = _chatItems[index];
-              return _buildChatItem(
-                item['name']!,
-                item['message']!,
-                badge: item['badge'],
-              );
-            },
-          ),
-        ),
-      ],
+      );
+    }
+    return ListView.builder(
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        return _buildChatItem(
+          item['name']!,
+          item['message']!,
+          badge: item['badge'],
+        );
+      },
     );
   }
 
@@ -79,7 +75,6 @@ class ChatContent extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          // 아바타
           Container(
             width: 40,
             height: 40,
@@ -94,7 +89,6 @@ class ChatContent extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          // 이름 & 메시지
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,7 +97,7 @@ class ChatContent extends StatelessWidget {
                   name,
                   style: const TextStyle(
                     color: Color(0xFF1F2024),
-                    fontSize: 12,
+                    fontSize: 14,
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w700,
                   ),
@@ -113,7 +107,7 @@ class ChatContent extends StatelessWidget {
                   message,
                   style: const TextStyle(
                     color: Color(0xFF71727A),
-                    fontSize: 12,
+                    fontSize: 14,
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w400,
                   ),
@@ -121,7 +115,6 @@ class ChatContent extends StatelessWidget {
               ],
             ),
           ),
-          // 배지
           if (badge != null)
             Container(
               width: 24,
@@ -137,7 +130,7 @@ class ChatContent extends StatelessWidget {
                   badge,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 10,
+                    fontSize: 12,
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w600,
                   ),

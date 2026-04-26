@@ -47,7 +47,7 @@ class SettingsDarkScreen extends StatelessWidget {
                                       '저장된 메세지',
                                       style: TextStyle(
                                         color: const Color(0xFFF5F5F5),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w400,
                                         height: 1.43,
@@ -102,7 +102,7 @@ class SettingsDarkScreen extends StatelessWidget {
                                       '최근 통화 ',
                                       style: TextStyle(
                                         color: const Color(0xFFF5F5F5),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w400,
                                         height: 1.43,
@@ -157,7 +157,7 @@ class SettingsDarkScreen extends StatelessWidget {
                                       '기기',
                                       style: TextStyle(
                                         color: const Color(0xFFF5F5F5),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w400,
                                         height: 1.43,
@@ -212,7 +212,7 @@ class SettingsDarkScreen extends StatelessWidget {
                                       '알림',
                                       style: TextStyle(
                                         color: const Color(0xFFF5F5F5),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w400,
                                         height: 1.43,
@@ -267,7 +267,7 @@ class SettingsDarkScreen extends StatelessWidget {
                                       '화면설정',
                                       style: TextStyle(
                                         color: const Color(0xFFF5F5F5),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w400,
                                         height: 1.43,
@@ -322,7 +322,7 @@ class SettingsDarkScreen extends StatelessWidget {
                                       '언어',
                                       style: TextStyle(
                                         color: const Color(0xFFF5F5F5),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w400,
                                         height: 1.43,
@@ -377,7 +377,7 @@ class SettingsDarkScreen extends StatelessWidget {
                                       '개인정보 및 보안',
                                       style: TextStyle(
                                         color: const Color(0xFFF5F5F5),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w400,
                                         height: 1.43,
@@ -432,7 +432,7 @@ class SettingsDarkScreen extends StatelessWidget {
                                       '저장공간',
                                       style: TextStyle(
                                         color: const Color(0xFFF5F5F5),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w400,
                                         height: 1.43,
@@ -557,7 +557,7 @@ class SettingsDarkScreen extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: const Color(0xFFF5F5F5),
-                              fontSize: 16,
+                              fontSize: 18,
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w800,
                               letterSpacing: 0.08,
@@ -568,7 +568,7 @@ class SettingsDarkScreen extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 12,
+                              fontSize: 14,
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w400,
                               height: 1.33,
@@ -635,7 +635,7 @@ class SettingsDarkScreen extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 14,
+                            fontSize: 16,
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w700,
                           ),
@@ -683,7 +683,7 @@ class SettingsDarkScreen extends StatelessWidget {
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 10,
+                                fontSize: 12,
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w400,
                                 height: 1.40,
@@ -720,11 +720,11 @@ class SettingsDarkScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              'Q&A',
+                              '질문과 답변',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 10,
+                                fontSize: 12,
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w400,
                                 height: 1.40,
@@ -761,11 +761,11 @@ class SettingsDarkScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              '메세지',
+                              '문자',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 10,
+                                fontSize: 12,
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w400,
                                 height: 1.40,
@@ -794,7 +794,7 @@ class SettingsDarkScreen extends StatelessWidget {
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 10,
+                                fontSize: 12,
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w400,
                                 height: 1.40,

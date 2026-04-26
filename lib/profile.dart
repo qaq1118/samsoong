@@ -69,7 +69,7 @@ class Frame extends StatelessWidget {
                                       '저장된 메세지',
                                       style: TextStyle(
                                         color: const Color(0xFF1F2024),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w400,
                                         height: 1.43,
@@ -124,7 +124,7 @@ class Frame extends StatelessWidget {
                                       '최근 통화 ',
                                       style: TextStyle(
                                         color: const Color(0xFF1F2024),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w400,
                                         height: 1.43,
@@ -179,7 +179,7 @@ class Frame extends StatelessWidget {
                                       '기기',
                                       style: TextStyle(
                                         color: const Color(0xFF1F2024),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w400,
                                         height: 1.43,
@@ -234,7 +234,7 @@ class Frame extends StatelessWidget {
                                       '알림',
                                       style: TextStyle(
                                         color: const Color(0xFF1F2024),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w400,
                                         height: 1.43,
@@ -289,7 +289,7 @@ class Frame extends StatelessWidget {
                                       '화면설정',
                                       style: TextStyle(
                                         color: const Color(0xFF1F2024),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w400,
                                         height: 1.43,
@@ -344,7 +344,7 @@ class Frame extends StatelessWidget {
                                       '언어',
                                       style: TextStyle(
                                         color: const Color(0xFF1F2024),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w400,
                                         height: 1.43,
@@ -399,7 +399,7 @@ class Frame extends StatelessWidget {
                                       '개인정보 및 보안',
                                       style: TextStyle(
                                         color: const Color(0xFF1F2024),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w400,
                                         height: 1.43,
@@ -454,7 +454,7 @@ class Frame extends StatelessWidget {
                                       '저장공간',
                                       style: TextStyle(
                                         color: const Color(0xFF1F2024),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontFamily: 'Inter',
                                         fontWeight: FontWeight.w400,
                                         height: 1.43,
@@ -578,7 +578,7 @@ class Frame extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: const Color(0xFF1F2024),
-                              fontSize: 16,
+                              fontSize: 18,
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w800,
                               letterSpacing: 0.08,
@@ -589,7 +589,7 @@ class Frame extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: const Color(0xFF71727A),
-                              fontSize: 12,
+                              fontSize: 14,
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w400,
                               height: 1.33,
@@ -673,7 +673,7 @@ class Frame extends StatelessWidget {
                                   '􀙇',
                                   style: TextStyle(
                                     color: const Color(0xFF1F2024),
-                                    fontSize: 14,
+                                    fontSize: 16,
                                     fontFamily: 'SF Pro Text',
                                     fontWeight: FontWeight.w400,
                                   ),
@@ -731,7 +731,7 @@ class Frame extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: const Color(0xFF1F2024),
-                            fontSize: 14,
+                            fontSize: 16,
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w700,
                           ),
@@ -779,7 +779,7 @@ class Frame extends StatelessWidget {
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: const Color(0xFF71727A),
-                                fontSize: 10,
+                                fontSize: 12,
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w400,
                                 height: 1.40,
@@ -816,11 +816,11 @@ class Frame extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              'Q&A',
+                              '질문과 답변',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: const Color(0xFF71727A),
-                                fontSize: 10,
+                                fontSize: 12,
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w400,
                                 height: 1.40,
@@ -857,11 +857,11 @@ class Frame extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              '메세지',
+                              '문자',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: const Color(0xFF71727A),
-                                fontSize: 10,
+                                fontSize: 12,
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w400,
                                 height: 1.40,
@@ -890,7 +890,7 @@ class Frame extends StatelessWidget {
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: const Color(0xFF71727A),
-                                fontSize: 10,
+                                fontSize: 12,
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w400,
                                 height: 1.40,

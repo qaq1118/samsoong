@@ -68,7 +68,7 @@ class QuestionContent extends StatelessWidget {
                     '1번째 질문',
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: 12,
+                      fontSize: 14,
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w400,
                     ),
@@ -78,7 +78,7 @@ class QuestionContent extends StatelessWidget {
                     '상대방이 가장 좋아하는 음식은?',
                     style: TextStyle(
                       color: Color(0xFF1F2024),
-                      fontSize: 14,
+                      fontSize: 16,
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w700,
                     ),
@@ -108,7 +108,7 @@ class QuestionContent extends StatelessWidget {
             label,
             style: const TextStyle(
               color: Colors.black,
-              fontSize: 10,
+              fontSize: 12,
               fontFamily: 'Inter',
               fontWeight: FontWeight.w400,
             ),
@@ -118,7 +118,7 @@ class QuestionContent extends StatelessWidget {
             value,
             style: const TextStyle(
               color: Colors.black,
-              fontSize: 20,
+              fontSize: 22,
               fontFamily: 'Inter',
               fontWeight: FontWeight.w700,
             ),

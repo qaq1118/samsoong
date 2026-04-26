@@ -17,9 +17,12 @@ class _ContactScreenState extends State<ContactScreen>
   late TabController _tabController;
   int _selectedNavIndex = 0;
   bool _isSearching = false;
+  bool _isChatSearching = false;
   final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _chatSearchController = TextEditingController();
+  String _chatSearchQuery = '';
 
-  final List<String> _navTitles = ['연락처', 'Q&A', '메세지', '설정'];
+  final List<String> _navTitles = ['연락처', '질문과 답변', '문자', '설정'];
 
   @override
   void initState() {
@@ -31,6 +34,7 @@ class _ContactScreenState extends State<ContactScreen>
   void dispose() {
     _tabController.dispose();
     _searchController.dispose();
+    _chatSearchController.dispose();
     super.dispose();
   }
 
@@ -40,8 +44,18 @@ class _ContactScreenState extends State<ContactScreen>
       backgroundColor: Colors.white,
       appBar: _isSearching
           ? _buildSearchAppBar()
+          : _isChatSearching
+          ? _buildChatSearchAppBar()
           : _selectedNavIndex == 0
           ? _buildContactAppBar()
+          : _selectedNavIndex == 2
+          ? _buildChatAppBar()
+          : _selectedNavIndex == 3
+          ? AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              automaticallyImplyLeading: false,
+            )
           : AppBar(
               backgroundColor: Colors.white,
               elevation: 0,
@@ -51,7 +65,7 @@ class _ContactScreenState extends State<ContactScreen>
                 _navTitles[_selectedNavIndex],
                 style: const TextStyle(
                   color: Color(0xFF1F2024),
-                  fontSize: 14,
+                  fontSize: 16,
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w700,
                 ),
@@ -72,8 +86,8 @@ class _ContactScreenState extends State<ContactScreen>
           ),
           // 1: Q&A
           QuestionContent(),
-          // 2: 메세지
-          ChatContent(),
+          // 2: 문자
+          ChatContent(searchQuery: _chatSearchQuery),
           // 3: 설정
           SettingContent(),
         ],
@@ -103,7 +117,7 @@ class _ContactScreenState extends State<ContactScreen>
           hintText: '검색',
           hintStyle: const TextStyle(
             color: Color(0xFF8F9098),
-            fontSize: 14,
+            fontSize: 16,
             fontFamily: 'Inter',
           ),
           border: InputBorder.none,
@@ -121,7 +135,73 @@ class _ContactScreenState extends State<ContactScreen>
         ),
         style: const TextStyle(
           color: Color(0xFF1F2024),
-          fontSize: 14,
+          fontSize: 16,
+          fontFamily: 'Inter',
+        ),
+      ),
+    );
+  }
+
+  PreferredSizeWidget _buildChatAppBar() {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      automaticallyImplyLeading: false,
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: IconButton(
+            icon: const Icon(Icons.search, color: Color(0xFF006FFD)),
+            onPressed: () => setState(() => _isChatSearching = true),
+          ),
+        ),
+      ],
+    );
+  }
+
+  PreferredSizeWidget _buildChatSearchAppBar() {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      automaticallyImplyLeading: false,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Color(0xFF1F2024)),
+        onPressed: () {
+          setState(() {
+            _isChatSearching = false;
+            _chatSearchController.clear();
+            _chatSearchQuery = '';
+          });
+        },
+      ),
+      title: TextField(
+        controller: _chatSearchController,
+        autofocus: true,
+        onChanged: (value) => setState(() => _chatSearchQuery = value),
+        decoration: InputDecoration(
+          hintText: '검색',
+          hintStyle: const TextStyle(
+            color: Color(0xFF8F9098),
+            fontSize: 16,
+            fontFamily: 'Inter',
+          ),
+          border: InputBorder.none,
+          filled: true,
+          fillColor: const Color(0xFFF7F8FD),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(24),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(24),
+            borderSide: BorderSide.none,
+          ),
+        ),
+        style: const TextStyle(
+          color: Color(0xFF1F2024),
+          fontSize: 16,
           fontFamily: 'Inter',
         ),
       ),
@@ -134,25 +214,19 @@ class _ContactScreenState extends State<ContactScreen>
       elevation: 0,
       centerTitle: true,
       automaticallyImplyLeading: false,
-      title: const Text(
-        '연락처',
-        style: TextStyle(
-          color: Color(0xFF1F2024),
-          fontSize: 14,
-          fontFamily: 'Inter',
-          fontWeight: FontWeight.w700,
-        ),
-      ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Color(0xFF006FFD)),
-            onPressed: () => setState(() => _isSearching = true),
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: IconButton(
+              icon: const Icon(Icons.search, color: Color(0xFF006FFD)),
+              onPressed: () => setState(() => _isSearching = true),
+            ),
           ),
         ],
       bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(44),
+        preferredSize: const Size.fromHeight(52),
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
             color: const Color(0xFFF7F8FD),
@@ -168,7 +242,7 @@ class _ContactScreenState extends State<ContactScreen>
             labelColor: const Color(0xFF1F2024),
             unselectedLabelColor: const Color(0xFF71727A),
             labelStyle: const TextStyle(
-              fontSize: 12,
+              fontSize: 14,
               fontFamily: 'Inter',
               fontWeight: FontWeight.w700,
             ),
@@ -178,7 +252,7 @@ class _ContactScreenState extends State<ContactScreen>
             tabs: const [
               Tab(text: '연락처'),
               Tab(text: '통화기록'),
-              Tab(text: '+고인 소환'),
+              Tab(text: '+ 추억 불러오기'),
             ],
           ),
         ),
@@ -196,7 +270,7 @@ class _ContactScreenState extends State<ContactScreen>
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Color(0xA01F2024),
-              fontSize: 18,
+              fontSize: 20,
               fontFamily: 'Inter',
               fontWeight: FontWeight.w800,
               letterSpacing: 0.09,
@@ -205,18 +279,19 @@ class _ContactScreenState extends State<ContactScreen>
           const SizedBox(height: 24),
           GestureDetector(
             onTap: () => _showSummonDialog(),
+            behavior: HitTestBehavior.opaque,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               decoration: ShapeDecoration(
                 color: const Color(0x89006FFD),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
               ),
               child: const Text(
-                '고인 소환하기',
+                '추억 불러오기',
                 style: TextStyle(
                     color: Colors.white,
-                    fontSize: 12,
+                    fontSize: 14,
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w600),
               ),
@@ -233,11 +308,11 @@ class _ContactScreenState extends State<ContactScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text(
-            '고인을 소환하세요.',
+            '추억을 불러오세요.',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Color(0xA01F2024),
-              fontSize: 18,
+              fontSize: 20,
               fontFamily: 'Inter',
               fontWeight: FontWeight.w800,
             ),
@@ -245,18 +320,19 @@ class _ContactScreenState extends State<ContactScreen>
           const SizedBox(height: 24),
           GestureDetector(
             onTap: () => _showSummonDialog(),
+            behavior: HitTestBehavior.opaque,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               decoration: ShapeDecoration(
                 color: const Color(0x89006FFD),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
               ),
               child: const Text(
-                '+고인 소환하기',
+                '+ 추억 불러오기',
                 style: TextStyle(
                     color: Colors.white,
-                    fontSize: 12,
+                    fontSize: 14,
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w600),
               ),
@@ -270,7 +346,7 @@ class _ContactScreenState extends State<ContactScreen>
   void _showSummonDialog() {    showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('고인 소환하기'),
+        title: const Text('추억 불러오기'),
         content: const Text('소환할 고인의 정보를 입력해주세요.'),
         actions: [
           TextButton(
@@ -294,8 +370,8 @@ class _ContactScreenState extends State<ContactScreen>
       child: Row(
         children: [
           _buildNavItem('연락처', Icons.contacts, 0),
-          _buildNavItem('Q&A', Icons.help_outline, 1),
-          _buildNavItem('메세지', Icons.message_outlined, 2),
+          _buildNavItem('질문과 답변', Icons.help_outline, 1),
+          _buildNavItem('문자', Icons.message_outlined, 2),
           _buildNavItem('설정', Icons.settings_outlined, 3),
         ],
       ),
@@ -308,7 +384,10 @@ class _ContactScreenState extends State<ContactScreen>
     return Expanded(
       child: GestureDetector(
         onTap: () => setState(() => _selectedNavIndex = index),
-        child: Column(
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          height: 72,
+          child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, color: color, size: 20),
@@ -317,12 +396,13 @@ class _ContactScreenState extends State<ContactScreen>
               label,
               style: TextStyle(
                 color: color,
-                fontSize: 10,
+                fontSize: 12,
                 fontFamily: 'Inter',
                 fontWeight: FontWeight.w400,
               ),
             ),
           ],
+        ),
         ),
       ),
     );
