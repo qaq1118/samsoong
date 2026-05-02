@@ -97,7 +97,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="_ylUDn7JWyKWrqgtmxRZ" name="페이지-2">
-    <mxGraphModel dx="2968" dy="2181" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2864" dy="2124" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -342,7 +342,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="MSQRM4Da-N9ZiQWc0vEV-159" parent="1" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.annotation_2;align=left;labelPosition=right;pointerEvents=1;" value="" vertex="1">
-          <mxGeometry height="100" width="50" x="-348" y="-501" as="geometry" />
+          <mxGeometry height="100" width="50" x="-347" y="-501" as="geometry" />
         </mxCell>
         <mxCell id="MSQRM4Da-N9ZiQWc0vEV-161" edge="1" parent="1" source="MSQRM4Da-N9ZiQWc0vEV-159" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;fontSize=12;startSize=8;endSize=8;endArrow=none;endFill=0;strokeWidth=3;">
           <mxGeometry relative="1" as="geometry">
@@ -399,8 +399,8 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="MSQRM4Da-N9ZiQWc0vEV-186" connectable="0" parent="1" style="edgeLabel;resizable=0;html=1;;align=center;verticalAlign=middle;" value="NO" vertex="1">
-          <mxGeometry x="41" y="-326" as="geometry">
-            <mxPoint x="-205" y="-2" as="offset" />
+          <mxGeometry x="41" y="-324" as="geometry">
+            <mxPoint x="-206" y="-1" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="MSQRM4Da-N9ZiQWc0vEV-187" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="" vertex="1">
