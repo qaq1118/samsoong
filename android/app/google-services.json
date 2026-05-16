@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "891516022067",
+    "project_id": "samsoong-db1",
+    "storage_bucket": "samsoong-db1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:891516022067:android:0c19e8416aadaaa016a246",
+        "android_client_info": {
+          "package_name": "com.example.samsoong"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "891516022067-3cnlq8bamm72s6c2tn4p7q8kmjqmtmgn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBas48myWR2JBRVnl0-yi39m6PvzDLKcAE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "891516022067-3cnlq8bamm72s6c2tn4p7q8kmjqmtmgn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "891516022067-9hq9b7v8o89sbpv9ogvvtqp9mv3v6rll.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.samsoong"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
