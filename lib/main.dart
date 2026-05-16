@@ -5,8 +5,10 @@ import 'setting.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  await initNotifications();
+  try {
+    await Firebase.initializeApp();
+    await initNotifications();
+  } catch (_) {}
   runApp(const FigmaToCodeApp());
 }
 
@@ -43,7 +45,7 @@ class FigmaToCodeApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const LoginScreen(), // 시작 화면을 LoginScreen으로 설정
+      home: const LoginScreen(),
     );
   }
 }

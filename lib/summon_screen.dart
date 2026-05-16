@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
+import 'app_state.dart';
 
 // 1. 선택 화면
 class SummonScreen extends StatelessWidget {
@@ -133,35 +134,38 @@ class _QuestionFormScreenState extends State<QuestionFormScreen> {
       return;
     }
     setState(() => _isSaving = true);
+    final name = _nameController.text.trim();
+    final relation = _relation;
+
     try {
-      final uid = FirebaseAuth.instance.currentUser!.uid;
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .collection('deceased')
-          .add({
-        'name': _nameController.text.trim(),
-        'birth': _birthController.text.trim(),
-        'relation': _relation,
-        'nickname': _nicknameController.text.trim(),
-        'intro': _introController.text.trim(),
-        'habits': _habitsController.text.trim(),
-        'createdAt': FieldValue.serverTimestamp(),
-        'type': 'question_form',
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('저장되었습니다!')),
-        );
-        Navigator.pop(context);
+      final prefs = await SharedPreferences.getInstance();
+      final uid = prefs.getString('uid') ?? '';
+      if (uid.isNotEmpty) {
+        final docRef = await FirebaseFirestore.instance
+            .collection('users').doc(uid).collection('deceased')
+            .add({
+          'name': name,
+          'birth': _birthController.text.trim(),
+          'relation': relation,
+          'nickname': _nicknameController.text.trim(),
+          'intro': _introController.text.trim(),
+          'habits': _habitsController.text.trim(),
+          'createdAt': FieldValue.serverTimestamp(),
+          'type': 'question_form',
+        });
+        AppState.instance.addPersonFromFirestore(docRef.id, name, relation);
+      } else {
+        AppState.instance.addPerson(name, relation);
       }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('저장에 실패했습니다. 다시 시도해주세요.')),
-        );
-      }
-    } finally {
+    } catch (_) {
+      AppState.instance.addPerson(name, relation);
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('저장되었습니다!')),
+      );
+      Navigator.pop(context);
       if (mounted) setState(() => _isSaving = false);
     }
   }

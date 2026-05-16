@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Frame extends StatefulWidget {
   const Frame({super.key});
@@ -23,14 +24,33 @@ class _FrameState extends State<Frame> {
 
   Future<void> _loadProfile() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _nameController.text = prefs.getString('profile_name') ?? '';
-      _phoneController.text = prefs.getString('profile_phone') ?? '';
-      _emailController.text = prefs.getString('profile_email') ?? '';
-      _gender = prefs.getString('profile_gender') ?? '여자';
-      final bday = prefs.getString('profile_birthday');
-      if (bday != null) _birthday = DateTime.tryParse(bday);
-    });
+    // SharedPreferences에서 즉시 로드 (캐시된 값)
+    if (mounted) {
+      setState(() {
+        _nameController.text = prefs.getString('profile_name') ?? '';
+        _emailController.text = prefs.getString('profile_email') ?? '';
+        _phoneController.text = prefs.getString('profile_phone') ?? '';
+        _gender = prefs.getString('profile_gender') ?? '여자';
+        final bday = prefs.getString('profile_birthday');
+        if (bday != null) _birthday = DateTime.tryParse(bday);
+      });
+    }
+    // Firestore에서 최신 값으로 덮어쓰기
+    final uid = prefs.getString('uid');
+    if (uid != null) {
+      final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      if (doc.exists && mounted) {
+        final name = doc.data()?['name'] ?? '';
+        final email = doc.data()?['email'] ?? '';
+        setState(() {
+          if (name.isNotEmpty) _nameController.text = name;
+          if (email.isNotEmpty) _emailController.text = email;
+        });
+        // 캐시 갱신
+        if (name.isNotEmpty) await prefs.setString('profile_name', name);
+        if (email.isNotEmpty) await prefs.setString('profile_email', email);
+      }
+    }
   }
 
   Future<void> _saveProfile() async {
@@ -40,6 +60,15 @@ class _FrameState extends State<Frame> {
     await prefs.setString('profile_email', _emailController.text.trim());
     await prefs.setString('profile_gender', _gender);
     if (_birthday != null) await prefs.setString('profile_birthday', _birthday!.toIso8601String());
+    // Firestore에도 업데이트
+    final uid = prefs.getString('uid');
+    if (uid != null) {
+      await FirebaseFirestore.instance.collection('users').doc(uid).update({
+        'name': _nameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'username': '@${_nameController.text.trim()}',
+      });
+    }
     if (mounted) Navigator.pop(context);
   }
 

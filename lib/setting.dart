@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -75,8 +74,9 @@ class SettingContent extends StatefulWidget {
 
 class _SettingContentState extends State<SettingContent> {
   File? _profileImage;
-  String _name = '최지우';
-  String _username = '@okong';
+  String _name = '사용자';
+  String _username = '@user';
+  String _email = '';
 
   @override
   void initState() {
@@ -85,20 +85,28 @@ class _SettingContentState extends State<SettingContent> {
   }
 
   Future<void> _loadProfile() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
+    final prefs = await SharedPreferences.getInstance();
+    final uid = prefs.getString('uid');
+    if (uid != null) {
       final doc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(user.uid)
+          .doc(uid)
           .get();
       if (doc.exists) {
+        final name = doc.data()?['name'] ?? '사용자';
+        final username = doc.data()?['username'] ?? '@user';
+        final email = doc.data()?['email'] ?? '';
         setState(() {
-          _name = doc.data()?['name'] ?? '사용자';
-          _username = doc.data()?['username'] ?? '@user';
+          _name = name;
+          _username = username;
+          _email = email;
         });
+        // SharedPreferences에 캐싱 (프로필 편집 화면에서 즉시 사용)
+        await prefs.setString('profile_name', name);
+        await prefs.setString('profile_username', username);
+        await prefs.setString('profile_email', email);
       }
     }
-    final prefs = await SharedPreferences.getInstance();
     final imagePath = prefs.getString('profile_image');
     if (imagePath != null) setState(() => _profileImage = File(imagePath));
   }
@@ -256,7 +264,7 @@ class _SettingContentState extends State<SettingContent> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  _username,
+                  _email.isNotEmpty ? _email : _username,
                   style: const TextStyle(
                     color: Color(0xFF71727A),
                     fontSize: 15,
@@ -397,7 +405,8 @@ class _SettingContentState extends State<SettingContent> {
           ),
           TextButton(
             onPressed: () async {
-              await FirebaseAuth.instance.signOut();
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.remove('uid');
               if (context.mounted) {
                 Navigator.pop(context);
                 Navigator.pushAndRemoveUntil(
@@ -792,12 +801,12 @@ class PrivacyScreen extends StatelessWidget {
           TextButton(
             onPressed: () async {
               try {
-                final user = FirebaseAuth.instance.currentUser;
-                if (user != null) {
-                  // Firestore 데이터 삭제
+                final prefs = await SharedPreferences.getInstance();
+                final uid = prefs.getString('uid');
+                if (uid != null) {
                   final deceased = await FirebaseFirestore.instance
                       .collection('users')
-                      .doc(user.uid)
+                      .doc(uid)
                       .collection('deceased')
                       .get();
                   for (final doc in deceased.docs) {
@@ -805,12 +814,9 @@ class PrivacyScreen extends StatelessWidget {
                   }
                   await FirebaseFirestore.instance
                       .collection('users')
-                      .doc(user.uid)
+                      .doc(uid)
                       .delete();
-                  // Firebase Auth 계정 삭제
-                  await user.delete();
                 }
-                final prefs = await SharedPreferences.getInstance();
                 await prefs.clear();
                 if (context.mounted) {
                   Navigator.pop(context);

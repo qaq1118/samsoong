@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'chatting.dart';
 
 class ChatScreen extends StatelessWidget {
@@ -34,18 +36,18 @@ class ChatContent extends StatefulWidget {
 }
 
 class _ChatContentState extends State<ChatContent> {
-  final List<Map<String, String?>> _chatItems = [
-    {'name': '홍길동', 'message': '', 'badge': null},
-  ];
+  String? _uid;
 
-  List<Map<String, String?>> get _filteredItems {
-    final query = widget.searchQuery.toLowerCase();
-    if (query.isEmpty) return List.from(_chatItems);
-    return _chatItems
-        .where((item) =>
-            item['name']!.toLowerCase().contains(query) ||
-            item['message']!.toLowerCase().contains(query))
-        .toList();
+  @override
+  void initState() {
+    super.initState();
+    _initUid();
+  }
+
+  Future<void> _initUid() async {
+    final prefs = await SharedPreferences.getInstance();
+    final uid = prefs.getString('uid');
+    if (mounted) setState(() => _uid = uid);
   }
 
   void _deleteItem(String name) {
@@ -60,12 +62,7 @@ class _ChatContentState extends State<ChatContent> {
             child: const Text('아니오'),
           ),
           TextButton(
-            onPressed: () {
-              setState(() {
-                _chatItems.removeWhere((item) => item['name'] == name);
-              });
-              Navigator.pop(context);
-            },
+            onPressed: () => Navigator.pop(context),
             child: const Text('예', style: TextStyle(color: Colors.red)),
           ),
         ],
@@ -73,85 +70,96 @@ class _ChatContentState extends State<ChatContent> {
     );
   }
 
-  void _addItem() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        final nameController = TextEditingController();
-        return AlertDialog(
-          title: const Text('새 대화 추가'),
-          content: TextField(
-            controller: nameController,
-            decoration: const InputDecoration(hintText: '이름 입력'),
-            autofocus: true,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('취소'),
-            ),
-            TextButton(
-              onPressed: () {
-                final name = nameController.text.trim();
-                if (name.isNotEmpty) {
-                  setState(() {
-                    _chatItems.add({'name': name, 'message': '새 대화', 'badge': null});
-                  });
-                }
-                Navigator.pop(context);
-              },
-              child: const Text('추가'),
+  void _addItem() {}
+
+  @override
+  Widget build(BuildContext context) {
+    if (_uid == null) {
+      return const Center(child: CircularProgressIndicator(color: Color(0xFF006FFD)));
+    }
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .doc(_uid)
+          .collection('deceased')
+          .orderBy('createdAt', descending: false)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator(color: Color(0xFF006FFD)));
+        }
+
+        final allItems = (snapshot.data?.docs ?? []).map((d) {
+          final data = d.data() as Map<String, dynamic>;
+          return <String, String?>{
+            'name': data['name'] as String? ?? '',
+            'message': '',
+            'badge': null,
+          };
+        }).toList();
+
+        final query = widget.searchQuery.toLowerCase();
+        final items = query.isEmpty
+            ? allItems
+            : allItems.where((item) =>
+                item['name']!.toLowerCase().contains(query) ||
+                item['message']!.toLowerCase().contains(query)).toList();
+
+        if (items.isEmpty && widget.searchQuery.isNotEmpty) {
+          return Column(
+            children: [
+              if (widget.showSearchBar) _buildSearchBar(),
+              const Expanded(
+                child: Center(
+                  child: Text(
+                    '검색 결과가 없습니다.',
+                    style: TextStyle(color: Color(0xFF8F9098), fontSize: 16, fontFamily: 'Inter'),
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+
+        if (items.isEmpty) {
+          return Column(
+            children: [
+              if (widget.showSearchBar) _buildSearchBar(),
+              const Expanded(
+                child: Center(
+                  child: Text(
+                    '아직 추억을 불러온 분이 없습니다.',
+                    style: TextStyle(color: Color(0xFF8F9098), fontSize: 15),
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+
+        return Column(
+          children: [
+            if (widget.showSearchBar) _buildSearchBar(),
+            Expanded(
+              child: ListView.builder(
+                itemCount: items.length + (widget.isEditMode ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (widget.isEditMode && index == items.length) {
+                    return _buildAddButton();
+                  }
+                  final item = items[index];
+                  return _buildChatItem(
+                    item['name']!,
+                    item['message']!,
+                    badge: item['badge'],
+                  );
+                },
+              ),
             ),
           ],
         );
       },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final items = _filteredItems;
-
-    if (items.isEmpty && widget.searchQuery.isNotEmpty) {
-      return Column(
-        children: [
-          if (widget.showSearchBar) _buildSearchBar(),
-          const Expanded(
-            child: Center(
-              child: Text(
-                '검색 결과가 없습니다.',
-                style: TextStyle(
-                  color: Color(0xFF8F9098),
-                  fontSize: 16,
-                  fontFamily: 'Inter',
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-    }
-
-    return Column(
-      children: [
-        if (widget.showSearchBar) _buildSearchBar(),
-        Expanded(
-          child: ListView.builder(
-            itemCount: items.length + (widget.isEditMode ? 1 : 0),
-            itemBuilder: (context, index) {
-              if (widget.isEditMode && index == items.length) {
-                return _buildAddButton();
-              }
-              final item = items[index];
-              return _buildChatItem(
-                item['name']!,
-                item['message']!,
-                badge: item['badge'],
-              );
-            },
-          ),
-        ),
-      ],
     );
   }
 

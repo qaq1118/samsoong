@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import 'signup_screen.dart';
 import 'contact_screen.dart';
+
+const _loginApiKey = 'AIzaSyBas48myWR2JBRVnl0-yi39m6PvzDLKcAE';
 void main() {
   runApp(const FigmaToCodeApp());
 }
@@ -168,19 +172,32 @@ class _LoginScreenState extends State<LoginScreen> {
                                     return;
                                   }
                                   try {
-                                    await FirebaseAuth.instance.signInWithEmailAndPassword(
-                                      email: _emailController.text.trim(),
-                                      password: _passwordController.text,
+                                    final res = await http.post(
+                                      Uri.parse('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=$_loginApiKey'),
+                                      headers: {'Content-Type': 'application/json'},
+                                      body: jsonEncode({
+                                        'email': _emailController.text.trim(),
+                                        'password': _passwordController.text,
+                                        'returnSecureToken': true,
+                                      }),
                                     );
-                                    setState(() => errorMessage = '');
-                                    if (mounted) {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => const ContactScreen()),
-                                      );
+                                    final data = jsonDecode(res.body);
+                                    if (res.statusCode == 200) {
+                                      // uid 저장
+                                      final prefs = await SharedPreferences.getInstance();
+                                      await prefs.setString('uid', data['localId']);
+                                      setState(() => errorMessage = '');
+                                      if (mounted) {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => const ContactScreen()),
+                                        );
+                                      }
+                                    } else {
+                                      setState(() => errorMessage = '이메일 또는 비밀번호가 일치하지 않습니다.');
                                     }
-                                  } on FirebaseAuthException {
-                                    setState(() => errorMessage = '이메일 또는 비밀번호가 일치하지 않습니다.');
+                                  } catch (e) {
+                                    setState(() => errorMessage = '네트워크 오류가 발생했습니다.');
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(

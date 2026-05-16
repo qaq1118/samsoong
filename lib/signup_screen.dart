@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+
+const _apiKey = 'AIzaSyBas48myWR2JBRVnl0-yi39m6PvzDLKcAE';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -36,22 +40,49 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() { _isLoading = true; _errorMessage = ''; });
 
     try {
-      final credential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
+      // Firebase Auth REST API로 회원가입 (reCAPTCHA 없음)
+      final res = await http.post(
+        Uri.parse('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=$_apiKey'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': _emailController.text.trim(),
+          'password': _passwordController.text,
+          'returnSecureToken': true,
+        }),
       );
 
-      // Firestore에 사용자 기본 정보 저장
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(credential.user!.uid)
-          .set({
-        'name': _nameController.text.trim(),
-        'email': _emailController.text.trim(),
-        'username': '@${_nameController.text.trim()}',
+      final data = jsonDecode(res.body);
+
+      if (res.statusCode != 200) {
+        String msg = '회원가입에 실패했습니다.';
+        final code = data['error']?['message'] ?? '';
+        if (code == 'EMAIL_EXISTS') msg = '이미 사용 중인 이메일입니다.';
+        if (code == 'INVALID_EMAIL') msg = '올바른 이메일 형식이 아닙니다.';
+        if (code == 'WEAK_PASSWORD : Password should be at least 6 characters') {
+          msg = '비밀번호는 6자 이상이어야 합니다.';
+        }
+        setState(() => _errorMessage = msg);
+        return;
+      }
+
+      final uid = data['localId'];
+
+      final name = _nameController.text.trim();
+      final email = _emailController.text.trim();
+
+      // Firestore에 사용자 정보 저장
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'name': name,
+        'email': email,
+        'username': '@$name',
         'createdAt': FieldValue.serverTimestamp(),
       });
+
+      // SharedPreferences에도 캐싱
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('profile_name', name);
+      await prefs.setString('profile_email', email);
+      await prefs.setString('profile_username', '@$name');
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -59,12 +90,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
         );
         Navigator.pop(context);
       }
-    } on FirebaseAuthException catch (e) {
-      String msg = '회원가입에 실패했습니다.';
-      if (e.code == 'email-already-in-use') msg = '이미 사용 중인 이메일입니다.';
-      if (e.code == 'invalid-email') msg = '올바른 이메일 형식이 아닙니다.';
-      if (e.code == 'weak-password') msg = '비밀번호가 너무 약합니다.';
-      setState(() => _errorMessage = msg);
+    } catch (e) {
+      setState(() => _errorMessage = '오류: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
