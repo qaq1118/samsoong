@@ -648,7 +648,7 @@ class FaqScreen extends StatelessWidget {
     },
     {
       'q': '계정을 삭제하려면 어떻게 하나요?',
-      'a': '설정 → 개인정보 및 보안 → 썸원 탈퇴하기를 통해 계정을 삭제할 수 있습니다. 탈퇴 시 모든 데이터가 영구 삭제됩니다.',
+      'a': '설정 → 개인정보 및 보안 → RE:Born 탈퇴하기를 통해 계정을 삭제할 수 있습니다. 탈퇴 시 모든 데이터가 영구 삭제됩니다.',
     },
   ];
 
@@ -763,7 +763,7 @@ class PrivacyScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text(
-          '썸원 탈퇴',
+          'RE:Born 탈퇴',
           style: TextStyle(color: Color(0xFF1F2024), fontSize: 18, fontWeight: FontWeight.w700),
         ),
         content: const Text(
@@ -832,7 +832,7 @@ class PrivacyScreen extends StatelessWidget {
                     SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        '썸원 탈퇴하기',
+                        'RE:Born 탈퇴하기',
                         style: TextStyle(
                           color: Color(0xFFFF4949),
                           fontSize: 16,
