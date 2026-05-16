@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
@@ -83,13 +85,22 @@ class _SettingContentState extends State<SettingContent> {
   }
 
   Future<void> _loadProfile() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      if (doc.exists) {
+        setState(() {
+          _name = doc.data()?['name'] ?? '사용자';
+          _username = doc.data()?['username'] ?? '@user';
+        });
+      }
+    }
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _name = prefs.getString('profile_name') ?? '최지우';
-      _username = prefs.getString('profile_username') ?? '@okong';
-      final imagePath = prefs.getString('profile_image');
-      if (imagePath != null) _profileImage = File(imagePath);
-    });
+    final imagePath = prefs.getString('profile_image');
+    if (imagePath != null) setState(() => _profileImage = File(imagePath));
   }
 
   Future<void> _pickImage() async {
@@ -385,13 +396,16 @@ class _SettingContentState extends State<SettingContent> {
             ),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-                (route) => false,
-              );
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              if (context.mounted) {
+                Navigator.pop(context);
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
             },
             child: const Text(
               '로그아웃',
@@ -777,15 +791,42 @@ class PrivacyScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: () async {
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.clear();
-              if (context.mounted) {
-                Navigator.pop(context);
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                  (route) => false,
-                );
+              try {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user != null) {
+                  // Firestore 데이터 삭제
+                  final deceased = await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(user.uid)
+                      .collection('deceased')
+                      .get();
+                  for (final doc in deceased.docs) {
+                    await doc.reference.delete();
+                  }
+                  await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(user.uid)
+                      .delete();
+                  // Firebase Auth 계정 삭제
+                  await user.delete();
+                }
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.clear();
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    (route) => false,
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('탈퇴에 실패했습니다. 다시 로그인 후 시도해주세요.')),
+                  );
+                }
               }
             },
             child: const Text('탈퇴하기', style: TextStyle(color: Color(0xFFFF4949))),

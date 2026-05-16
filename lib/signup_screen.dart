@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-// 💡 1. mounted 에러 해결을 위해 StatefulWidget으로 변경했습니다.
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -10,10 +10,65 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  // 💡 2. 컨트롤러를 클래스 바로 아래로 옮겼습니다.
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _passwordConfirmController = TextEditingController();
+  final _nameController = TextEditingController();
+  bool _isLoading = false;
+  String _errorMessage = '';
+
+  Future<void> _signUp() async {
+    if (_nameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _passwordController.text.isEmpty) {
+      setState(() => _errorMessage = '모든 항목을 입력해주세요.');
+      return;
+    }
+    if (_passwordController.text != _passwordConfirmController.text) {
+      setState(() => _errorMessage = '비밀번호가 일치하지 않습니다.');
+      return;
+    }
+    if (_passwordController.text.length < 6) {
+      setState(() => _errorMessage = '비밀번호는 6자 이상이어야 합니다.');
+      return;
+    }
+
+    setState(() { _isLoading = true; _errorMessage = ''; });
+
+    try {
+      final credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+
+      // Firestore에 사용자 기본 정보 저장
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(credential.user!.uid)
+          .set({
+        'name': _nameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'username': '@${_nameController.text.trim()}',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('회원가입이 완료되었습니다!')),
+        );
+        Navigator.pop(context);
+      }
+    } on FirebaseAuthException catch (e) {
+      String msg = '회원가입에 실패했습니다.';
+      if (e.code == 'email-already-in-use') msg = '이미 사용 중인 이메일입니다.';
+      if (e.code == 'invalid-email') msg = '올바른 이메일 형식이 아닙니다.';
+      if (e.code == 'weak-password') msg = '비밀번호가 너무 약합니다.';
+      setState(() => _errorMessage = msg);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,72 +87,58 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              '가입하기',
-              style: TextStyle(color: Color(0xFF1F2024), fontSize: 24, fontWeight: FontWeight.w800),
-            ),
-            const Text(
-              '시작하려면 계정을 생성하세요',
-              style: TextStyle(color: Color(0xFF71727A), fontSize: 14),
-            ),
+            const Text('가입하기',
+                style: TextStyle(color: Color(0xFF1F2024), fontSize: 24, fontWeight: FontWeight.w800)),
+            const Text('시작하려면 계정을 생성하세요',
+                style: TextStyle(color: Color(0xFF71727A), fontSize: 14)),
             const SizedBox(height: 32),
 
-            // 💡 3. 함수 호출할 때 컨트롤러를 각각 넣어줍니다.
+            if (_errorMessage.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Text(_errorMessage,
+                    style: const TextStyle(color: Colors.red, fontSize: 13, fontWeight: FontWeight.bold)),
+              ),
+
             _buildInputField('이름', '이름을 입력하세요', controller: _nameController),
             const SizedBox(height: 16),
             _buildInputField('이메일 주소', 'name@email.com', controller: _emailController),
             const SizedBox(height: 16),
-            _buildInputField('비밀번호', '비밀번호를 입력하세요', isPassword: true, controller: _passwordController),
+            _buildInputField('비밀번호', '비밀번호를 입력하세요 (6자 이상)', isPassword: true, controller: _passwordController),
             const SizedBox(height: 16),
-            _buildInputField('비밀번호 확인', '비밀번호를 다시 입력하세요', isPassword: true),
+            _buildInputField('비밀번호 확인', '비밀번호를 다시 입력하세요', isPassword: true, controller: _passwordConfirmController),
             const SizedBox(height: 32),
 
             SizedBox(
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                onPressed: () async {
-                  if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("이메일과 비밀번호를 모두 입력해주세요.")),
-                    );
-                    return;
-                  }
-
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.setString('user_email', _emailController.text);
-                  await prefs.setString('user_pw', _passwordController.text);
-                  await prefs.setString('user_name', _nameController.text);
-
-                  if (mounted) { // 이제 에러 안 남!
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("회원가입이 완료되었습니다!")),
-                    );
-                    Navigator.pop(context);
-                  }
-                },
+                onPressed: _isLoading ? null : _signUp,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF006FFD),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: const Text('가입하기', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text('가입하기', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ),
+            const SizedBox(height: 24),
           ],
         ),
       ),
     );
   }
 
-  // 💡 4. 공통 함수에 controller 파라미터를 추가했습니다.
-  Widget _buildInputField(String label, String hint, {bool isPassword = false, TextEditingController? controller}) {
+  Widget _buildInputField(String label, String hint,
+      {bool isPassword = false, TextEditingController? controller}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black)),
         const SizedBox(height: 8),
         TextField(
-          controller: controller, // 👈 여기에 연결해줘야 사용자가 입력한 값을 가져올 수 있어요!
+          controller: controller,
           obscureText: isPassword,
           style: const TextStyle(color: Colors.black),
           decoration: InputDecoration(

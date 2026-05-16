@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io';
 
 // 1. 선택 화면
@@ -121,6 +123,48 @@ class _QuestionFormScreenState extends State<QuestionFormScreen> {
   final _nicknameController = TextEditingController();
   final _introController = TextEditingController();
   final _habitsController = TextEditingController();
+  bool _isSaving = false;
+
+  Future<void> _save() async {
+    if (_nameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('고인의 이름을 입력해주세요.')),
+      );
+      return;
+    }
+    setState(() => _isSaving = true);
+    try {
+      final uid = FirebaseAuth.instance.currentUser!.uid;
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('deceased')
+          .add({
+        'name': _nameController.text.trim(),
+        'birth': _birthController.text.trim(),
+        'relation': _relation,
+        'nickname': _nicknameController.text.trim(),
+        'intro': _introController.text.trim(),
+        'habits': _habitsController.text.trim(),
+        'createdAt': FieldValue.serverTimestamp(),
+        'type': 'question_form',
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('저장되었습니다!')),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('저장에 실패했습니다. 다시 시도해주세요.')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -200,13 +244,15 @@ class _QuestionFormScreenState extends State<QuestionFormScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: _isSaving ? null : _save,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0x89006FFD),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    child: const Text('저장하기', style: TextStyle(color: Colors.white, fontSize: 15)),
+                    child: _isSaving
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text('저장하기', style: TextStyle(color: Colors.white, fontSize: 15)),
                   ),
                 ),
               ],

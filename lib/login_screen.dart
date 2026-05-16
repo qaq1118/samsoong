@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'signup_screen.dart';
 import 'contact_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   runApp(const FigmaToCodeApp());
 }
@@ -163,35 +163,24 @@ class _LoginScreenState extends State<LoginScreen> {
                               height: 52,
                               child: ElevatedButton(
                                 onPressed: () async {
-                                  // 1. DB(저장소) 열기
-                                  final prefs = await SharedPreferences.getInstance();
-
-                                  // 2. 저장된 데이터 꺼내기 (signup_screen에서 저장한 이름표로 찾기)
-                                  String? savedEmail = prefs.getString('user_email');
-                                  String? savedPw = prefs.getString('user_pw');
-
-                                  // 3. 검증 로직
-                                  // 입력값이 비어있지 않고, DB에 저장된 값과 정확히 일치하는지 확인
-                                  if (savedEmail != null &&
-                                      savedEmail == _emailController.text &&
-                                      savedPw == _passwordController.text) {
-
-                                    // ✅ 로그인 성공!
-                                    setState(() {
-                                      errorMessage = ""; // 에러 메시지 초기화
-                                    });
-
+                                  if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+                                    setState(() => errorMessage = '이메일과 비밀번호를 입력해주세요.');
+                                    return;
+                                  }
+                                  try {
+                                    await FirebaseAuth.instance.signInWithEmailAndPassword(
+                                      email: _emailController.text.trim(),
+                                      password: _passwordController.text,
+                                    );
+                                    setState(() => errorMessage = '');
                                     if (mounted) {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(builder: (context) => const ContactScreen()),
                                       );
                                     }
-                                  } else {
-                                    // ❌ 로그인 실패 (DB에 없거나 비번이 틀림)
-                                    setState(() {
-                                      errorMessage = "이메일 또는 비밀번호가 일치하지 않습니다.";
-                                    });
+                                  } on FirebaseAuthException {
+                                    setState(() => errorMessage = '이메일 또는 비밀번호가 일치하지 않습니다.');
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(
